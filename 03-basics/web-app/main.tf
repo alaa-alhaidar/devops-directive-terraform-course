@@ -1,11 +1,19 @@
 terraform {
   # Assumes s3 bucket and dynamo DB table already set up
   # See /code/03-basics/aws-backend
+
+  # dynamic variables
+  # S3 Bucket
+  # DynamoDB TABLE
+  # AMI Amazon Machine Image
+  # Region
+  # Type machine
+
   backend "s3" {
-    bucket         = "devops-directive-tf-state"
-    key            = "03-basics/web-app/terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "terraform-state-locking"
+    bucket         = "alaa-bucket"
+    key            = "03-basics/web-app/terraform.tfstate" # whre the file will be saven on S3 bucket
+    region         = "eu-north-1"
+    dynamodb_table = "my_dynamo_table"
     encrypt        = true
   }
 
@@ -18,12 +26,12 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region = "eu-north-1"
 }
 
 resource "aws_instance" "instance_1" {
-  ami             = "ami-011899242bb902164" # Ubuntu 20.04 LTS // us-east-1
-  instance_type   = "t2.micro"
+  ami             = "ami-005ac2fecf4d02b8e"  # Updated AMI ID
+  instance_type   = "t3.micro"
   security_groups = [aws_security_group.instances.name]
   user_data       = <<-EOF
               #!/bin/bash
@@ -33,8 +41,8 @@ resource "aws_instance" "instance_1" {
 }
 
 resource "aws_instance" "instance_2" {
-  ami             = "ami-011899242bb902164" # Ubuntu 20.04 LTS // us-east-1
-  instance_type   = "t2.micro"
+  ami             = "ami-005ac2fecf4d02b8e"  # Updated AMI ID
+  instance_type   = "t3.micro"
   security_groups = [aws_security_group.instances.name]
   user_data       = <<-EOF
               #!/bin/bash
@@ -42,6 +50,7 @@ resource "aws_instance" "instance_2" {
               python3 -m http.server 8080 &
               EOF
 }
+
 
 resource "aws_s3_bucket" "bucket" {
   bucket_prefix = "devops-directive-web-app-data"
@@ -212,9 +221,30 @@ resource "aws_db_instance" "db_instance" {
   storage_type               = "standard"
   engine                     = "postgres"
   engine_version             = "12"
-  instance_class             = "db.t2.micro"
+  instance_class             = "db.t3.micro"
   name                       = "mydb"
   username                   = "foo"
   password                   = "foobarbaz"
   skip_final_snapshot        = true
 }
+
+/*
+  terraform init
+  terraform plan
+  terraform apply
+  terraform destroy
+  terraform state
+  //  list              List resources in the state
+    mv                  Move an item in the state
+    pull                Pull current state and output to stdout
+    push                Update remote state from a local state file
+    replace-provider    Replace provider in the state
+    rm                  Remove instances from the state
+    show                Show a resource in the state
+  terraform output
+  terraform import
+
+
+# to get AMI
+  aws ec2 describe-images --owners self amazon --filters "Name=name,Values=ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*" --region eu-north-1
+*/
