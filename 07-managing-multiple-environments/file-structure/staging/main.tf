@@ -1,11 +1,11 @@
 terraform {
   # Assumes s3 bucket and dynamo DB table already set up
   # See /code/03-basics/aws-backend
-  backend "s3" {
-    bucket         = "devops-directive-tf-state"
-    key            = "07-managing-multiple-environments/staging/terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "terraform-state-locking"
+ backend "s3" {
+    bucket         = "alaa-bucket"
+    key            = "07-managing-multiple-environments/production/terraform.tfstate"
+    region         = "eu-north-1"
+    dynamodb_table = "my_dynamo_table"
     encrypt        = true
   }
 
@@ -18,7 +18,7 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region = "eu-north-1"
 }
 
 variable "db_pass" {
@@ -38,7 +38,7 @@ module "web_app" {
   bucket_prefix    = "web-app-data-${local.environment_name}"
   domain           = "devopsdeployed.com"
   environment_name = local.environment_name
-  instance_type    = "t2.micro"
+  instance_type    = "t3.micro"
   create_dns_zone  = false
   db_name          = "${local.environment_name}mydb"
   db_user          = "foo"

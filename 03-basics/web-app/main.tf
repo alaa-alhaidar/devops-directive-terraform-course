@@ -30,6 +30,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "instance_1" {
+  
   ami             = "ami-005ac2fecf4d02b8e"  # Updated AMI ID
   instance_type   = "t3.micro"
   security_groups = [aws_security_group.instances.name]
@@ -57,8 +58,8 @@ resource "aws_s3_bucket" "bucket" {
   force_destroy = true
 }
 
-resource "aws_s3_bucket_versioning" "bucket_versioning" {
-  bucket = aws_s3_bucket.bucket.id
+resource "aws_s3_bucket_versioning" "bucket_versioning" { # always resource type then name of it 
+  bucket = aws_s3_bucket.bucket.id # retrieve the bucket we created earlier based on it is ID
   versioning_configuration {
     status = "Enabled"
   }
@@ -211,7 +212,7 @@ resource "aws_route53_record" "root" {
   }
 }
 
-resource "aws_db_instance" "db_instance" {
+resource "aws_db_instance" "db_instance" { # create RDS database ressource with specs
   allocated_storage = 20
   # This allows any minor version within the major engine_version
   # defined below, but will also result in allowing AWS to auto
@@ -223,7 +224,7 @@ resource "aws_db_instance" "db_instance" {
   engine_version             = "12"
   instance_class             = "db.t3.micro"
   name                       = "mydb"
-  username                   = "foo"
+  username                   = "foo" # login infos
   password                   = "foobarbaz"
   skip_final_snapshot        = true
 }
