@@ -56,15 +56,15 @@ resource "aws_db_instance" "default" {
   engine               = "postgres"
   engine_version       = "14.13"
   instance_class       = "db.t3.micro"
-  name                 = "mydatabase"
+  name                 = "test"
   username             = "alaa" # in authentication felds 
-  password             = "password123" # in authentication felds 
+  password             = "alaa1234" # in authentication felds 
   publicly_accessible  = true
   skip_final_snapshot  = true
   vpc_security_group_ids = [aws_security_group.rds_sg.id] # Associates the instance with the security group created earlier
 
   tags = {
-    Name = "MyPostgresRDSInstance"
+    Name = "test"
   }
 }
 /*

@@ -33,7 +33,19 @@ data "aws_subnet_ids" "default_subnet" {
   vpc_id = data.aws_vpc.default_vpc.id
 }
 
+/*
+A policy is a JSON document that defines permissions. Policies specify which actions are allowed or 
+denied for specific AWS resources. Policies can be attached to roles, users, or groups.
+*/
+
 # Define IAM roles for EMR. iam=identity and access managmenet 
+# An IAM role is an AWS identity with specific permissions that can be assumed by entities (e.g., users, 
+# applications, services).
+/*
+A role contains:
+	•	Trust Policy: Defines which entities (principals) can assume, use the role.
+	•	Attached Policies: Grant permissions to perform actions. Actions then are used by ressources such EC2 to access S3
+*/
 resource "aws_iam_role" "emr_service_role" {
   name = "EMR_DefaultRole"
 
@@ -51,6 +63,7 @@ resource "aws_iam_role" "emr_service_role" {
   })
 }
 
+# attaching policy to role, here attaching two policies to EMR role
 resource "aws_iam_role_policy_attachment" "emr_service_policy_attachment" {
   role       = aws_iam_role.emr_service_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceRole"

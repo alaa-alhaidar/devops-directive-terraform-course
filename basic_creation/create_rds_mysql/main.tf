@@ -44,9 +44,9 @@ resource "aws_db_instance" "default" {
   engine               = "mysql"
   engine_version       = "8.0"
   instance_class       = "db.t3.micro"
-  name                 = "mydatabase"
-  username             = "admin"
-  password             = "password123"
+  name                 = "test"
+  username             = "alaa"
+  password             = "alaa123"
   parameter_group_name = "default.mysql8.0"
   publicly_accessible  = true
   skip_final_snapshot  = true
@@ -54,7 +54,7 @@ resource "aws_db_instance" "default" {
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
 
   tags = {
-    Name = "MyRDSInstance"
+    Name = "test"
   }
 }
 
