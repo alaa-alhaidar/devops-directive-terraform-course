@@ -4,7 +4,12 @@ variable "instance_type" {
   default     = "m5.xlarge"
   sensitive   = false
 }
-
+variable "subnet" {
+  description = "subnet id"
+  type        = string
+  default     = "subnet-04b4c37d24693cf70"
+  sensitive   = false
+}
 variable "key_name" {
   description = "key name pem file"
   type        = string

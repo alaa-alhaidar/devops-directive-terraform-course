@@ -1,8 +1,39 @@
-provider "aws" {
-  region = "eu-north-1" # Specify your AWS region
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
+    }
+  }
+
+  backend "s3" {
+    bucket         = "alaa-bucket"
+    key            = "terraform.tfstate"
+    region         = "eu-north-1"
+    encrypt        = true
+  }
 }
 
-# Define IAM roles for EMR
+provider "aws" {
+  profile = "alaa-aws"
+  region  = "eu-north-1"
+}
+
+# This data block is used to retrieve information about the default VPC in the AWS account.
+/* 
+ Default VPC: When you create an AWS account, AWS automatically creates a default VPC in each region. 
+ This default VPC is available to you without requiring any additional setup.
+ */
+data "aws_vpc" "default_vpc" {
+  default = true
+}
+
+# Query subnets in the default VPC
+data "aws_subnet_ids" "default_subnet" {
+  vpc_id = data.aws_vpc.default_vpc.id
+}
+
+# Define IAM roles for EMR. iam=identity and access managmenet 
 resource "aws_iam_role" "emr_service_role" {
   name = "EMR_DefaultRole"
 
@@ -70,8 +101,8 @@ resource "aws_emr_cluster" "example" {
   log_uri       = "s3://alaa-bucket/" # S3 bucket for logging
   service_role  = aws_iam_role.emr_service_role.arn
   ec2_attributes {
-    key_name = var.key_name # SSH key for accessing EC2 instances
-    #subnet_id                   = "subnet-xxxxxxxx"  # Specify your subnet ID
+    key_name         = var.key_name                                      # SSH key for accessing EC2 instances
+    subnet_id        = var.subnet                                        # Use the first subnet ID
     instance_profile = aws_iam_instance_profile.emr_instance_profile.arn # Instance profile for EC2 instances
   }
 
@@ -87,7 +118,7 @@ resource "aws_emr_cluster" "example" {
 
   # Define the step to run a JAR file from S3
   step {
-    name              = "Spark Step"
+    name              = "Join"
     action_on_failure = "CONTINUE"
     hadoop_jar_step {
       jar = "command-runner.jar"
@@ -100,11 +131,26 @@ resource "aws_emr_cluster" "example" {
       ]
     }
   }
+  step {
+    name              = "LinearRegression"
+    action_on_failure = "CONTINUE"
+    hadoop_jar_step {
+      jar = "command-runner.jar"
+      args = [
+        "spark-submit",
+        "--deploy-mode", "cluster",
+        "--class", "com.LinearRegression",                    # Replace with the fully qualified class name
+        "s3://alaa-bucket/custom-jar-name_scala2.12-0.1.jar", # Path to your JAR file in S3
+        var.output_path                                       # Path to output in S3
+      ]
+    }
+  }
 
   tags = {
     Name = "example-emr-cluster"
   }
 }
+
 
 
 

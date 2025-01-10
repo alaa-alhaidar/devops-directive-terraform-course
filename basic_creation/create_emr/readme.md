@@ -24,3 +24,10 @@ args = [
   "s3://alaa.data.tuberlin/custom-jar-name_scala2.12-0.1.jar"  # Path to your JAR file in S3
 ]
 
+# Why You Need aws_iam_instance_profile
+Assigning Permissions to EC2 Instances:
+
+The aws_iam_instance_profile resource creates an instance profile that links an IAM role to EC2 instances. This profile is then associated with the EC2 instances in your EMR cluster, allowing them to assume the permissions granted by the role.
+EMR Cluster Configuration:
+
+When setting up an EMR cluster, you specify the instance profile for the EC2 instances in the ec2_attributes block. This tells EMR which IAM role the EC2 instances should use.
